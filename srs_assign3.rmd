@@ -1,0 +1,28 @@
+---
+title: "SRS_Assignment3"
+output: pdf_document
+date: "2023-03-23"
+---
+```{r}
+
+data <- c(y100, y010, y110, y001, y101, y011, y111) # Read in the data
+A <- c(1,0,1,0,1,0,1) # Read in the values for A (i values) for given data
+B <- c(0,1,1,0,0,1,1) # Read in the values for B (j values) for given data
+C <- c(0,0,0,1,1,1,1) # Read in the values for C (k values) for given data
+
+
+
+data_m<-c(1, 1, 1, 15, 0, 3, 19, 54, 
+                 4, 19, 62, 464, 76, 703, 1006)
+A<- c(rep(1,8),rep(0,7))
+B<- c(rep(1,4),rep(0,4),rep(1,4),rep(0,3))
+C<-c(rep(c(1,0,1,0),3),c(1,0,1))
+D<-c(rep(c(1,1,0,0),3),c(1,1,0))
+
+check<-cbind(data_m,A,B,C,D)
+check
+model <- glm(data_m~A+B+C+D+(A+B+C+D)^2, family=poisson(link="log"))
+
+summary(model)
+```
+
