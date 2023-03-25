@@ -1,79 +1,39 @@
----
-title: "SRS_Assignment3"
-output: pdf_document
-date: "2023-03-23"
----
-```{r}
-
-
-
 data_m<-c(1, 1, 1, 15, 0, 3, 19, 54, 
-                 4, 19, 62, 464, 76, 703, 1006)
-
-#**** Coefficients: Indicator variables for the 4 Lists ******
-# LA: Local Authority
-# NGO: Non Governmental Organization
-# PF: Police Force
-# GO: Governmental Organization
-
+          4, 19, 62, 464, 76, 703, 1006)
 LA<- c(rep(1,8),rep(0,7))
 NGO<- c(rep(1,4),rep(0,4),rep(1,4),rep(0,3))
 PF<-c(rep(c(1,0,1,0),3),c(1,0,1))
 GO<-c(rep(c(1,1,0,0),3),c(1,1,0))
 
-df<-data.frame(cbind(data_m,LA,NGO,PF,GO))
-#***** 1.  Initial model ***********
+check<-cbind(data_m,LA,NGO,PF,GO)
+check<-as.data.frame(check)
 
-```
+combine_variable<-cbind(LA,NGO,PF,GO)
 
+model1<-glm(data_m~LA+NGO+PF+GO,family=poisson)
+summary(model1)
 
-```{r}
-#**** 2. Model with interaction terms: using all interaction terms *****
+par(mfrow=c(2,2))
+plot(model1)
 
-model <- glm(data_m~LA+NGO+PF+GO+(LA+NGO+PF+GO)^2, family=poisson(link="log"))
-
-summary(model)
-
-# Estimate of the total population size
-exp(summary(model)$coefficients[1,1])+sum(data_m)
-
-# Confidence interval for the population size:
-b0<-summary(model)$coefficients[1,1]
-b0_se<-summary(model)$coefficients[1,2]
-
-# Confidence Interval for unobserved population
-# Question: (1.96 right, not t distribution values right?)
-
-
-cat('\nThe 95% confidence interval for the unobserved population is ',
-    exp(b0),
-    ' +- ',
-    exp(1.96*b0_se))
-
-```
-
-```{r}
-#**** 3. Model with interaction terms: Adding terms based on AIC ****
-
-step_mod<-step(model)
-summary(step_model)
-```
-
-
-```{r}
-#**** 4. Correlations btwn variables as a criterion to choose interactions ****
-# Looking at correlations between variables 
 #install.packages("psych")
 library(psych)
 
-  one<-which(df$LA==0 & df$NGO==0)
-  two<-which(df$LA==1&df$NGO==0)
-  three<-which(df$LA==0&df$NGO==1)
-  four<-which(df$LA==1&df$NGO==1)
-  
-  pair<-matrix(c(sum(df$data_m[one]), sum(df$data_m[two]), 
-                 sum(df$data_m[three]), sum(df$data_m[four])), nrow=2)
-  
-  tetrachoric(pair)
-```
+### Compute the 1 pair of variables
 
+
+  one<-which(check$LA==0&check$NGO==0)
+  two<-which(check$LA==1&check$NGO==0)
+  three<-which(check$LA==0&check$NGO==1)
+  four<-which(check$LA==1&check$NGO==1)
+
+  pair<-matrix(c(sum(check$data_m[one]), sum(check$data_m[two]), 
+                 sum(check$data_m[three]), sum(check$data_m[four])), nrow=2)
+
+  tetrachoric(pair)
+
+
+
+model2 <- glm(data_m~LA+NGO+PF+GO+(LA+NGO+PF+GO)^2, family=poisson(link="log"))
+
+summary(model2)
