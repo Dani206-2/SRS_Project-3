@@ -38,7 +38,6 @@ summary(model)
 exp(summary(model)$coefficients[1,1])+sum(data_m)
 
 # Confidence Interval for unobserved population
-
 cat('\nThe 95% confidence interval for the unobserved population is ',
     '(',
     exp(b0-1.96*b0_se),
