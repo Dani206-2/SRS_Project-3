@@ -82,3 +82,21 @@ par(mfrow = c(2, 2))
 plot(step_model)
 ```
 
+```{r}
+#**** 7. Confidence Interval for total N  ****
+# Final estimate of the total population size
+exp(summary(step_model)$coefficients[1,1])+sum(data_m)
+
+# Final confidence interval for the total population size N
+b0_N<-summary(step_model)$coefficients[1,1]
+b0_se_N<-summary(step_model)$coefficients[1,2]
+
+# Confidence Interval for the total population size N
+cat('\nThe 95% confidence interval for the total population size N is ',
+    '(',
+    exp(b0_N-1.96*b0_se_N)+sum(data_m),
+    ',',
+    exp(b0_N+1.96*b0_se_N)+sum(data_m),
+    ')')
+
+```
