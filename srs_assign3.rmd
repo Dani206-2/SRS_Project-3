@@ -38,14 +38,13 @@ summary(model)
 exp(summary(model)$coefficients[1,1])+sum(data_m)
 
 # Confidence Interval for unobserved population
-# Explain: 'beta_0 + 1.96*std' is used to calculate a 95% confidence interval for a linear regression coefficient when the distribution of the errors is assumed to be normal. For a Poisson GLM model, the assumption of normality does not hold, the standard error of the estimated coefficients depends on the value of the response variable and is not constant. We use 'confint' function which takes into account the non-constant variance of the response variable. It performs better than 'beta_0 + 1.96*std'.
 
 cat('\nThe 95% confidence interval for the unobserved population is ',
-'(',    
-suppressMessages(exp(confint(model , level = 0.95))[1,1]),
-',',
-suppressMessages(exp(confint(model , level = 0.95))[1,2]),
-')')
+    '(',
+    exp(b0-1.96*b0_se),
+    ',',
+    exp(b0+1.96*b0_se),
+    ')')
 
 ```
 
