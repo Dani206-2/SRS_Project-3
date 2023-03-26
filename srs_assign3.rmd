@@ -78,35 +78,7 @@ library(psych)
 
 ```{r}
 #**** 6. Checking model assumptions ****
-library(ggplot2)
-library(gridExtra)
-
-
-# Plot 1: Residuals vs Fitted Values
-res_fitted <- ggplot(data = step_model, aes(x = fitted(step_model), y = residuals(step_model))) + 
-  geom_point() + 
-  geom_smooth(method = "loess") + 
-  labs(title = "Residuals vs Fitted Values", x = "Fitted Values", y = "Residuals")
-
-# Plot 2: Normal Q-Q Plot
-qq_plot <-ggplot(data = step_model, aes(sample = residuals(step_model))) +   geom_qq() + 
-  geom_abline(slope = 1, intercept = 0) + 
-  labs(title = "Normal Q-Q Plot")
-
-# Plot 3: Scale-Location Plot
-sca_loca <- ggplot(data = step_model, aes(x = fitted(step_model), y = sqrt(abs(residuals(step_model))))) + 
-  geom_point() + 
-  geom_smooth(method = "loess") + 
-  labs(title = "Scale-Location Plot", x = "Fitted Values", y = "Sqrt(|Residuals|)")
-
-# Plot 4: Residuals vs Leverage
-res_leve <- ggplot(data = step_model, aes(x = hatvalues(step_model), y = residuals(step_model))) + 
-  geom_point() + 
-  geom_smooth(method = "loess") + 
-  labs(title = "Residuals vs Leverage", x = "Leverage", y = "Residuals")
-
-grid.arrange(res_fitted , qq_plot, sca_loca, res_leve,
-             ncol = 2,
-             nrow = 2)
+par(mfrow = c(2, 2))
+plot(step_model)
 ```
 
