@@ -73,13 +73,40 @@ library(psych)
 ```
 ```{r}
 #**** 5. Goodness of fit for selected model ****
+pearson_residual <- residuals(step_model, type="pearson")
+ssr <- sum(pearson_residual^2) 
+pchisq(ssr, 7)
 ```
 
 
 ```{r}
 #**** 6. Checking model assumptions ****
-par(mfrow = c(2, 2))
-plot(step_model)
+
+library(ggplot2)
+
+
+# Create data frame for ggplot
+df <- data.frame(fitted = log(step_model$fitted.values),
+                 pearson_residual = pearson_residual)
+
+# Pearson residuals plot
+p1 <- ggplot(df, aes(x = fitted, y = pearson_residual)) +
+  geom_point(color="steelblue")+
+  geom_hline(aes(yintercept=0),color="#F8766D")+
+  labs(x = "Fitted values (log scale)", y = "Pearson residuals") +
+  theme_bw()
+
+# QQ plot of Pearson residuals
+p2 <- ggplot(df, aes(sample = pearson_residual)) +
+  geom_qq(color="steelblue") +
+  stat_qq_line(color="#F8766D") +
+  labs(x = "Theoretical quantiles", y = "Pearson residuals") +
+  theme_bw()
+
+# Combine the plots
+gridExtra::grid.arrange(p1, p2, ncol = 2)
+
+
 ```
 
 ```{r}
