@@ -1,8 +1,8 @@
 ---
-title: "SRS_Assignment3"
+title: "Appendix"
 output: pdf_document
-date: "2023-03-23"
 ---
+# Initial model without interaction terms
 ```{r}
 
 
@@ -28,10 +28,10 @@ model<-glm(data_m~LA+NGO+PF+GO, family=poisson(link="log"))
 
 summary(model)
 ```
-
+# Model with interaction terms: using all interaction terms
 
 ```{r}
-#**** 2. Model with interaction terms: using all interaction terms *****
+
 
 model <- glm(data_m~LA+NGO+PF+GO+(LA+NGO+PF+GO)^2, family=poisson(link="log"))
 
@@ -40,16 +40,28 @@ summary(model)
 ```
 
 
-
+# Model with interaction terms: Relative Goodness of Fit
 
 ```{r}
-#**** 3. Model with interaction terms: Adding terms based on AIC ****
 
+# Terms are added one by one and best model is chosen based on AIC
 step_model<-step(model)
 summary(step_model)
+qchisq(p=0.05,df=7,lower.tail=FALSE)
+
 ```
-The residual deviance is 11.341 for 7 degrees of freedom. The change in deviance is 6047.262-11.341 = 6035.921. 
-Comparing this with the Ch-sq critical value for 14-7=7 degrees of freedom, we can reject the null hypothesis and conclude that our chosen model fits the data much better compared to an intercept only model
+
+
+# Assessing Absolute Goodness of Fit
+The residual deviance is 11.341 for 7 degrees of freedom. Compared with Chi-Sq
+$\alpha$=0.05 critical value for 7 degrees of freedom (14.067), we don't
+reject the null hypothesis, hence no evidence of lack of fit.
+
+The change in deviance is 6047.262-11.341 = 6035.921. 
+Comparing this with the Ch-sq 5% critical value for 14-7=7 degrees of freedom, we can reject the null hypothesis of an intercept only model and conclude that our chosen model fits the data much better compared to an intercept only model.
+
+We can also call the anova function to see how the deviance changed for the addition
+of each term
 
 ```{r}
 anova(step_model)
@@ -60,16 +72,23 @@ anova(step_model)
 final_model<-glm(data_m~LA+NGO+PF+GO+(LA*NGO)+(LA*PF)+(NGO*GO), family=poisson(link="log"))
 summary(final_model)
 ```
+
+## Estimate of total population 
+$exp(\beta_0)$ + sum(data from lists)
 ```{r}
 exp(summary(final_model)$coefficients[1,1])+sum(data_m)
 ```
 
+## Coefficients from the model
 ```{r}
 summary(final_model)$coefficients
 ```
 
 
+# Pearson Residual plots
 ```{r}
+
+pearson_residual <- residuals(step_model, type="pearson")
 library(ggplot2)
 
 
@@ -96,34 +115,41 @@ gridExtra::grid.arrange(p1, p2, ncol = 2)
 
 
 ```
+
+
+Checking which datapoint the largest residual corresponds to,
 ```{r}
-# Checcking fitted values against original
+# Checking fitted values against original
 cbind(step_model$fitted.values,data_m,pearson_residual)
 ```
 
 
+# Confidence intervals: Profile likelihood
+
+The PL method has a few differences from the regular confidence interval.
+It first evaluates the Profile function for a parameter. The profile function
+takes a parameter of interest and then maximizes the likelihood with respect
+to it, keeping values of other parameters fixed. The maximum value of the 
+profile function is further used to compute likelihood ratio statistics
+and compared with the asymptotic chi-sq distribution for confidence intervals.
+For more on Profile Likelihood, please see Royston, 2007 given in 
+references
 
 ```{r}
-prof<-profile(final_model,level=0.95)
-```
-
-
-# Profile Likelihood method for the confidence interval
-```{r}
-
-conf<-confint(profile(final_model,level=0.95))
+conf<-confint(final_model,level=0.95)
 conf
 ```
 
+
+For the confidence intervals of the total population, 
+exp(intervals for beta_0)+sum(data)
 ```{r}
-exp(confint(profile(final_model,level=0.95))[1,1:2])+sum(data_m)
+exp(confint(final_model,level=0.95)[1,1:2])+sum(data_m)
 ```
 
 
-For the confidence intervals of the total population, exp(intervals for beta_0)+sum(data)
-```{r}
-exp(confint(profile(model_paper,level=0.95))[1,1:2])+sum(data)
-```
+
+
 
 
 
